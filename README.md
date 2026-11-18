@@ -6,10 +6,8 @@ Render's free web service. No payment method is required for any of it.
 This repository is only the deploy shell. At build time `build.mjs` downloads
 the application bundle (`src/`, `public/`, `tools/`, package files) from the
 bot's mirror and unpacks it, then `deploy/render/start.sh` runs the bot with the
-mirror pusher beside it.
-
-A commit to this repo re-runs the build, which re-downloads the current bundle —
-that is also how a code change reaches the running service.
+mirror pusher beside it. A commit here re-runs the build, which re-downloads the
+current bundle — that is how a code change reaches the running service.
 
 ## Deploy
 
@@ -25,6 +23,13 @@ on every restart — the bot restores its book from the mirror at boot.
 
 ## Controls
 
-`POST /api/close-profitable` banks every open position that is in profit, using
-the pool's real depth and the normal round-trip cost. Positions with no
-tradeable depth are left alone and reported in the response.
+`POST /api/close-profitable` banks every open position that is in profit.
+`POST /api/close-all` flats everything that has a buyer, profit or loss.
+Both use the pool's real depth and the normal round-trip cost, and both report
+what they skipped (a pool with no liquidity cannot be sold into).
+
+## Dashboard
+
+Each open position shows its mint and pool address as a chip you can tap to
+copy. Each closed trade has a **copy** button that puts every listed field plus
+the raw record on the clipboard, for pasting into a chat.
