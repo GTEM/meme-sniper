@@ -5,7 +5,9 @@
 # own mirror publishes. build.mjs unpacks it; start.sh runs the bot with the
 # mirror pusher beside it so the book is backed up off the ephemeral disk.
 #
-# Set PUBLISH_URL and INGEST_TOKEN when Render asks for them.
+# No values are requested at apply time on purpose: PUBLISH_URL and INGEST_TOKEN
+# are added afterwards in the service's Environment tab, which only affects
+# mirroring and book backup, not whether the bot runs.
 services:
   - type: web
     name: meme-sniper
@@ -19,7 +21,3 @@ services:
         value: "22"
       - key: MODE
         value: paper
-      - key: PUBLISH_URL
-        sync: false
-      - key: INGEST_TOKEN
-        sync: false
