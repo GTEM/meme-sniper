@@ -39,3 +39,11 @@ reason, entry reasons — with no JSON.
 The closed-trades table shows two different things: **peak** is the best price
 the position touched (unrealised, muted and marked "gave back" when it ended
 red), **profit** is what the trade actually netted after fees.
+
+## Numbers in a trade
+
+`entryPrice` and `exitPrice` are market prices: `exitPrice` is the price the
+sells filled at, weighted by size. Fees are counted once, in `feesUsd`, never
+folded into the price — so **price move − fees = net**. Trades closed before
+this rule carry `exitPriceNet` (the old fee-inclusive value) and an
+`exitPriceBasis` of `gross` or `fill`.
