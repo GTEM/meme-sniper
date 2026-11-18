@@ -1,0 +1,25 @@
+# Render blueprint for the bot, on the free plan (no payment method needed).
+#
+# This repository is deliberately thin. Render's free web service gets 0.1 CPU
+# and a throwaway disk, and the application bundle it runs is the one the bot's
+# own mirror publishes. build.mjs unpacks it; start.sh runs the bot with the
+# mirror pusher beside it so the book is backed up off the ephemeral disk.
+#
+# Set PUBLISH_URL and INGEST_TOKEN when Render asks for them.
+services:
+  - type: web
+    name: meme-sniper
+    runtime: node
+    plan: free
+    buildCommand: node build.mjs
+    startCommand: bash deploy/render/start.sh
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: MODE
+        value: paper
+      - key: PUBLISH_URL
+        sync: false
+      - key: INGEST_TOKEN
+        sync: false
