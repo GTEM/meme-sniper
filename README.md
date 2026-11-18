@@ -31,5 +31,7 @@ what they skipped (a pool with no liquidity cannot be sold into).
 ## Dashboard
 
 Each open position shows its mint and pool address as a chip you can tap to
-copy. Each closed trade has a **copy** button that puts every listed field plus
-the raw record on the clipboard, for pasting into a chat.
+copy. Each closed trade has a **copy** button: it copies that trade as plain
+lines — symbol, name, chain, venue, mode, mint, pool, opened, closed, held,
+entry, exit, invested, returned, pnl, gross, fees, peak, score, rug risk, exit
+reason, entry reasons — with no JSON.
