@@ -35,3 +35,7 @@ copy. Each closed trade has a **copy** button: it copies that trade as plain
 lines — symbol, name, chain, venue, mode, mint, pool, opened, closed, held,
 entry, exit, invested, returned, pnl, gross, fees, peak, score, rug risk, exit
 reason, entry reasons — with no JSON.
+
+The closed-trades table shows two different things: **peak** is the best price
+the position touched (unrealised, muted and marked "gave back" when it ended
+red), **profit** is what the trade actually netted after fees.
