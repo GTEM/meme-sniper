@@ -1,0 +1,65 @@
+name: mirror-backup
+
+# Keeps a byte-for-byte copy of the project backup inside this repository, so it
+# survives the mirror site going down. The archive itself is downloaded by the
+# runner (it is 3 MB of binary, not something to commit by hand) and checked
+# against the sha256 the mirror publishes before it is committed.
+#
+# Re-run it from the Actions tab ("Run workflow") to pick up a newer archive; it
+# replaces the previous one instead of piling copies up.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/mirror-backup.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mirror-backup
+  cancel-in-progress: true
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the archive and verify its checksum
+        run: |
+          set -euo pipefail
+          base="https://meme-sniper-jkzxfz-preview.freebuff.site/backup"
+          mkdir -p backup
+          curl -fsSL "$base/MANIFEST.txt" -o backup/MANIFEST.txt
+          name="$(sed -n 's/^archive *//p' backup/MANIFEST.txt | awk '{print $1}')"
+          want="$(sed -n 's/^sha256 *//p' backup/MANIFEST.txt | awk '{print $1}')"
+          if [ -z "$name" ] || [ -z "$want" ]; then
+            echo "::error::MANIFEST.txt does not name an archive and a sha256"
+            exit 1
+          fi
+          curl -fsSL "$base/$name" -o "backup/$name"
+          got="$(sha256sum "backup/$name" | cut -d' ' -f1)"
+          echo "want $want"
+          echo "got  $got"
+          if [ "$want" != "$got" ]; then
+            echo "::error::checksum mismatch: the download is not the archive the manifest describes"
+            exit 1
+          fi
+          echo "verified $name ($(stat -c%s "backup/$name") bytes)"
+
+      - name: Keep only the newest archive and commit it
+        run: |
+          set -euo pipefail
+          keep="$(sed -n 's/^archive *//p' backup/MANIFEST.txt | awk '{print $1}')"
+          find backup -maxdepth 1 -name '*.tar.gz' ! -name "$keep" -print -delete
+          git config user.name 'mirror-backup'
+          git config user.email 'backup@users.noreply.github.com'
+          git add -A backup
+          if git diff --cached --quiet; then
+            echo 'backup already up to date'
+            exit 0
+          fi
+          git commit -m "backup: mirror archive $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
