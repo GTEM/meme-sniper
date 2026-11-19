@@ -10,7 +10,7 @@ services:
     name: meme-sniper
     runtime: node
     plan: free
-    buildCommand: npm ci --omit=dev --omit=optional
+    buildCommand: node build.mjs
     startCommand: bash deploy/render/start.sh
     autoDeploy: true
     envVars:
