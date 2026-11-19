@@ -5,4 +5,4 @@ deploy is this log plus a push. Each entry names the bundle it shipped.
 
 | When (UTC)       | Bundle sha256 | Change |
 | ---------------- | ------------- | ------ |
-| 2026-11-19 00:35 | `f0a436164bcbe1d00126d72722086cc678e9e143ddd8a0b4be514e5e255ecb5f` | Closed trades show exact entry/exit prices and a per-row `price move - fees = profit` line; the fees card is split into closed and open instead of one running total. |
+| 2026-11-19 00:39 | `ae6ebfbbeb5f23e967fffdf4373026f5cf6e0cefda54c1c1129796fcfbda0d29` | Every closed trade shows exact entry/exit prices plus `price move - fees = profit` on the row and in the copied record; the fees card is split into closed and open; dollars carry the sign in front (`-$0.04`). |
