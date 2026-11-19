@@ -19,11 +19,12 @@ services:
       - key: MODE
         value: paper
       # Testing only: the wallet read follows devnet, so the book stays a test
-      # book until the stack is ready for mainnet money.
+      # book until the stack is ready for mainnet money. devnet is already the
+      # boot default in src/config.js, so this only pins it; nothing here has to
+      # be typed in the dashboard for a restarted (wiped-disk) service to come
+      # back on devnet.
       - key: PAPER_WALLET_NETWORK
         value: devnet
-      - key: PAPER_WALLET_ADDRESS
-        sync: false
       - key: PUBLISH_URL
         sync: false
       - key: INGEST_TOKEN
