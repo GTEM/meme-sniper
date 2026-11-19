@@ -1,28 +1,10 @@
-meme-sniper — full project backup
-created   2026-11-19 00:51 UTC
-archive   meme-sniper-backup-2026-11-19b.tar.gz   (3071432 bytes, 242 files)
-sha256    9690d8c20369641b54f3f8a562dd5d230669d07dc134d8d380f0bf9a88dabd33
-download  https://meme-sniper-jkzxfz-preview.freebuff.site/backup/meme-sniper-backup-2026-11-19b.tar.gz
-
-WHAT IS INSIDE
-  src/                 bot + server (engine, strategy, portfolio, feeds, exec)
-  public/              the dashboard (exact trade rows, UTC clock, copy report)
-  tools/               selftest, repair scripts, publish-state, preview proxy
-  deploy/              Render build/start/bundle scripts, Termux notes, README
-  site/                the Freebuff mirror Worker (D1 snapshot + book backup)
-  data/                the paper book, model, blacklist, settings, dated backups
-  data/render-live-book-2026-11-19.json   live book pulled from the mirror
-  restore-points/ ab-restore/ merge-in/ artifacts/ docs/   earlier copies
-  README.md .env.example package.json package-lock.json render.yaml
-
-LEFT OUT OR SCRUBBED
-  .secrets/ and every .env at any depth — never archived, never uploaded
-  every RPC api-key and token value inside the remaining files replaced with REDACTED
-  *.log, node_modules/, .git, site/assets/ and deploy/render/app.tar.gz (regenerable)
-
-HOW TO RESTORE
-  tar -xzf meme-sniper-backup-2026-11-19b.tar.gz          # unpacks a single meme-sniper/ folder
-  cd meme-sniper && npm install        # then set .env / .secrets/ingest-token again
-  node tools/selftest.mjs             # expect ALL CHECKS PASSED
-  node src/index.js                    # dashboard on http://localhost:3080
-  paper trading only; the live book is data/render-live-book-2026-11-19.json
+project  meme-sniper
+archive  meme-sniper-backup-2026-11-19c.tar.gz
+sha256   c7c7e21e616616cfa9b77cbf40d9ea34b13e7675f6bd5d89d50dd7935da7172d
+bytes    3046835
+files    304
+built    2026-11-19T01:42:53Z
+source   https://meme-sniper-jkzxfz-preview.freebuff.site/backup/meme-sniper-backup-2026-11-19c.tar.gz
+secrets  redacted api-key=<uuid>, Solscan token, settings.json key fields, bearer keys
+excluded .env, .secrets, node_modules, .git, logs, site/assets, deploy/render/app.tar.gz
+note     restore with: tar xzf meme-sniper-backup-2026-11-19c.tar.gz && cd meme-sniper && npm ci
