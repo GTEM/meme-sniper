@@ -5,6 +5,10 @@ name: mirror-backup
 # runner (it is 3 MB of binary, not something to commit by hand) and checked
 # against the sha256 the mirror publishes before it is committed.
 #
+# The archive is also scanned for key material: a key belongs in .env and the
+# host's environment only, never in a file that leaves the machine, so a dirty
+# build fails the run instead of being committed.
+#
 # Re-run it from the Actions tab ("Run workflow") to pick up a newer archive; it
 # replaces the previous one instead of piling copies up.
 
@@ -48,6 +52,20 @@ jobs:
             exit 1
           fi
           echo "verified $name ($(stat -c%s "backup/$name") bytes)"
+
+      - name: Refuse an archive that carries a key
+        run: |
+          set -euo pipefail
+          name="$(sed -n 's/^archive *//p' backup/MANIFEST.txt | awk '{print $1}')"
+          rm -rf "$RUNNER_TEMP/scan" && mkdir -p "$RUNNER_TEMP/scan"
+          tar xzf "backup/$name" -C "$RUNNER_TEMP/scan"
+          found="$(grep -rIlE 'api-key=[A-Za-z0-9._-]{20,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.|(INGEST_TOKEN|PUMPFUN_API_KEY|SOLSCAN_API_KEY)[=:][ ]*[A-Za-z0-9_]{20,}' "$RUNNER_TEMP/scan" || true)"
+          if [ -n "$found" ]; then
+            echo "::error::the archive contains key material; rebuild it with tools/backup-project.sh"
+            printf '%s\n' "$found"
+            exit 1
+          fi
+          echo "clean: no key material in $name"
 
       - name: Keep only the newest archive and commit it
         run: |
