@@ -1,10 +1,10 @@
 project  meme-sniper
-archive  meme-sniper-backup-2026-11-19c.tar.gz
-sha256   c7c7e21e616616cfa9b77cbf40d9ea34b13e7675f6bd5d89d50dd7935da7172d
-bytes    3046835
-files    304
-built    2026-11-19T01:42:53Z
-source   https://meme-sniper-jkzxfz-preview.freebuff.site/backup/meme-sniper-backup-2026-11-19c.tar.gz
+archive  meme-sniper-backup-2026-11-19d.tar.gz
+sha256   e02d7b8f505cf4e7fcf7eba6396c23c64f9f0dd002d49b27f8469372a50a9fdf
+bytes    2036597
+files    303
+built    2026-11-19T01:46:54Z
+source   https://meme-sniper-jkzxfz-preview.freebuff.site/backup/meme-sniper-backup-2026-11-19d.tar.gz
 secrets  redacted api-key=<uuid>, Solscan token, settings.json key fields, bearer keys
 excluded .env, .secrets, node_modules, .git, logs, site/assets, deploy/render/app.tar.gz
-note     restore with: tar xzf meme-sniper-backup-2026-11-19c.tar.gz && cd meme-sniper && npm ci
+note     restore with: tar xzf meme-sniper-backup-2026-11-19d.tar.gz && cd meme-sniper && npm ci
