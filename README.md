@@ -29,6 +29,15 @@ while 150–200% lost $1.00 a trade and held three total-loss rugs. The deep-poo
 override is off by default (`DEEP_LIQ_OVERRIDE_USD=0`) and can never clear churn;
 a non-zero value only clears a safety or accumulated-risk veto.
 
+## Discovery
+
+GeckoTerminal is the firehose but rate-limits shared IPs, so discovery also reads
+DexScreener token profiles and Jupiter's recent launches. Jupiter's buffer holds
+half an hour of mints; each scan now prices 30 spread across that age range
+instead of only the newest and oldest fifteen. The ends were the two useless
+bands — pools seconds old have no indexed liquidity, and the oldest are about to
+age out — while the 2–20 minute window the gate trades was never sampled.
+
 ## Learning
 
 The entry model learns from every closed trade. Its weights are stored inside
