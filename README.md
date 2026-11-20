@@ -53,9 +53,11 @@ for every open position's token accounts. The pool's token accounts change
 with every swap, so the exit sees the real price instead of DexScreener's
 pair quote, which was measured sitting still for 15 seconds — long enough for
 a +10% winner to print -27% on the next quote. Entries on PumpSwap fill at the
-reserve price too. If the RPC is down, the index feeds below still price the
-exit and the reserve read retries after a minute. `status.pumpswapPriced`
-counts reserve-priced samples and `status.pumpswapRpcAt` is the last one.
+reserve price too. If the reserves are thinner than the index quote, the order
+is re-capped to the on-chain depth before it is filled. If the RPC is down, the
+index feeds below still price the exit and the reserve read retries after a
+minute. `status.pumpswapPriced` counts reserve-priced samples and
+`status.pumpswapRpcAt` is the last one.
 
 The fast rug watch keeps its 18%/25% thresholds measured over a rolling
 scan-length window, not over the last poll, so checking four times as often does
