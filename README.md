@@ -12,83 +12,25 @@ current bundle — that is how a code change reaches the running service.
 ## Deploy
 
 1. <https://dashboard.render.com/register> — sign up with GitHub, no card.
-2. **New → Blueprint**, pick this repository, apply.
+2.
+**New → Blueprint**, pick this repository, apply.
 3. Add `PUBLISH_URL` and `INGEST_TOKEN` in the service's Environment tab for
    mirroring and book backup (optional; the bot runs without them).
 
 The service keeps itself awake: it asks its own `/api/state` every ten minutes,
-which resets Render's 15-minute idle timer. Free tier limits: 750 instance hours
+which resets Render's 15-minute idle timer.
+Free tier limits: 750 instance hours
 a month (a 31-day month is 744), 0.1 CPU, 512 MB, and a filesystem that is wiped
 on every restart — the bot restores its book from the mirror at boot.
 
-## Entry gate (2026-11-20)
+## Costs
 
-A launch is refused when 5m volume exceeds **150% of the pool's own liquidity**.
-The 157-trade book puts the break there: the 100–150% band made +$0.16 a trade,
-while 150–200% lost $1.00 a trade and held three total-loss rugs. The deep-pool
-override is off by default (`DEEP_LIQ_OVERRIDE_USD=0`) and can never clear churn;
-a non-zero value only clears a safety or accumulated-risk veto.
-
-## Age
-
-There is no upper age limit. `MIN_AGE_SEC` (2 minutes) keeps launches too young
-to have a pool out, but an old coin that starts moving is eligible on the same
-signals as a new one: turnover, buy pressure, momentum, holder concentration and
-liquidity. Set `MAX_AGE_SEC` to a positive value to restore a hard "too old"
-veto; 0 is the default. The freshness feature stays on a 20-minute scale either
-way, so turning the cap off does not change what the model learned about young
-launches.
-
-## Drained quote leg
-
-A PumpSwap pool can lose its SOL side while the token side stays put. That is not
-a feed gap, and it is not a price the bot can sell into. An on-chain reserve read
-showing tokens and no SOL now marks the position held within one 6s tick: zero
-depth, carried at entry, dashboard reason "pool SOL reserve drained", and no
-time-stop sale at a stale quote. If the SOL leg comes back on the same pool,
-pricing resumes; if the token moves to a new pool, the normal migration path
-follows it. A pool with no market for 24h is written off at $0 with the reason
-kept in the book.
-
-PumpSwap creates pools in both mint orders: token/WSOL and WSOL/token. Both are
-read now. Rejecting the inverted ones is what left NEX Ai priced only by the
-index while its own pool held 2 lamports of SOL and 550 tokens.
-
-DexScreener reporting `$0` liquidity on its own is still treated as a feed gap —
-some healthy PumpSwap pairs report that while trading normally. Only the pool's
-own token accounts can say the SOL leg is gone.
-
-## Corrections
-
-The book is not rewritten in place for a bad print. A fill that could not have
-happened is corrected on boot by a keyed, idempotent repair, and the old values
-are kept on the trade under `correction` plus a portfolio-level `corrections`
-log. NEX Ai is the first: it was "sold" at the time stop while its pool held 550
-tokens and 2 lamports of SOL, so $1.62 of proceeds were removed, only the real
-entry fee ($0.012525) was kept, the trade is booked at -$1.67 (-100%), and the
-model is rebuilt from the corrected book. Cash went from $67.0635 to $65.4459.
-
-## Discovery
-
-GeckoTerminal is the firehose but rate-limits shared IPs, so discovery also reads
-DexScreener token profiles and Jupiter's recent launches. Jupiter's buffer holds
-half an hour of mints; each scan now prices 30 spread across that age range
-instead of only the newest and oldest fifteen. The ends were the two useless
-bands — pools seconds old have no indexed liquidity, and the oldest are about to
-age out — while the middle of the window is where a launch actually becomes
-tradeable.
-
-## Learning
-
-The entry model learns from every closed trade. Its weights are stored inside
-the mirrored book, so a Render restart no longer resets them to the priors; at
-boot the bot restores them from the book, or rebuilds them by replaying the
-book's trades. `POST /api/reset` clears the ledger but keeps the model.
-
-The trail gap and give-back are learned the same way, as a bandit: each venue
-tries `tight`, `base` and `loose` arms, the arm is stored on the trade, and UCB1
-keeps the arm with the better average realized net PnL. The counts ride in the
-book too; `EXIT_POLICY_LEARNING=off` pins every trade to `base`.
+Paper fills charge the venue's fee on both legs plus a depth-based slippage
+curve. The AMM profile is **1% round trip** (0.5% a side), capped at 1%: the old
+12% "all-in" number double-counted the slippage the curve already charges, so a
++4.47% AMM move could print as a −7.69% loss. GTA, DCTY and CANDY were rebooked
+at the 1% rate, with the old values kept on each trade under `feeCorrection`;
+urgent exits keep their 150 bps premium.
 
 ## Controls
 
@@ -96,56 +38,6 @@ book too; `EXIT_POLICY_LEARNING=off` pins every trade to `base`.
 `POST /api/close-all` flats everything that has a buyer, profit or loss.
 Both use the pool's real depth and the normal round-trip cost, and both report
 what they skipped (a pool with no liquidity cannot be sold into).
-
-`POST /api/reset` archives the book to
-`data/archive/portfolio-before-reset-<time>.json` before clearing the portfolio
-(the learned model is kept and mirrored with the book). An optional
-`{"cash": 76.16}` body starts the fresh book from that amount instead of the
-configured bankroll. It refuses while a position is open, and the response
-carries the archived path and the fresh book so a throwaway host can push the
-new book to the mirror immediately.
-
-## Exit checks
-
-Open positions are re-priced every `EXIT_CHECK_MS` (6s) in a loop separate from
-the 25s scan. A flat book makes no requests; with positions it is one batched
-price call per chain, falling back to one batched DexScreener call when
-GeckoTerminal throttles, then to one batched Jupiter quote for whatever
-DexScreener misses. Every quote is capped at 4s: an empty or slow answer is
-retried on the next 6s slot, and only repeated misses back off, up to one scan
-interval. The scan tick still records equity and saves the book. The fast loop
-exists because a peak stop set at 12% used to fill 13-27% below the high (median
-~18%): the move happened between two scans.
-
-PumpSwap positions are priced from the pool's own reserves first: one
-`getAccountInfo` per pool (cached 30 minutes) and one `getMultipleAccounts`
-for every open position's token accounts. The pool's token accounts change
-with every swap, so the exit sees the real price instead of DexScreener's
-pair quote, which was measured sitting still for 15 seconds — long enough for
-a +10% winner to print -27% on the next quote. Entries on PumpSwap fill at the
-reserve price too. If the reserves are thinner than the index quote, the order
-is re-capped to the on-chain depth before it is filled. If the RPC is down, the
-index feeds below still price the exit and the reserve read retries after a
-minute. `status.pumpswapPriced` counts reserve-priced samples and
-`status.pumpswapRpcAt` is the last one.
-
-The fast rug watch keeps its 18%/25% thresholds measured over a rolling
-scan-length window, not over the last poll, so checking four times as often does
-not quietly defuse it. The scan tick and the fast loop share one position-pass
-lock, so the same position can never be sold twice.
-
-## Momentum exhaustion
-
-A trade that has run and then gives back 5% of its peak price (6% on AMM pools)
-is sold, once its peak reached +6% net (+10% on AMM). This is the normal exit
-for a move that has stopped working: waiting for the 12% peak stop let winners
-that peaked at +8..+25% round-trip to breakeven or a loss. The peak stop stays
-as the backstop for a gap. Tune per venue with `*_MOMENTUM_ARM_PCT` and
-`*_MOMENTUM_GIVEBACK_PCT`; 0 turns either half off.
-
-A separate loss cut, **momentum death**, exits after three lower readings while
-more than 8% underwater; its reason carries the net and peak so it is not
-confused with the winner give-back above.
 
 ## Dashboard
 
