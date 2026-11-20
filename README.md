@@ -29,6 +29,13 @@ while 150–200% lost $1.00 a trade and held three total-loss rugs. The deep-poo
 override is off by default (`DEEP_LIQ_OVERRIDE_USD=0`) and can never clear churn;
 a non-zero value only clears a safety or accumulated-risk veto.
 
+## Learning
+
+The entry model learns from every closed trade. Its weights are stored inside
+the mirrored book, so a Render restart no longer resets them to the priors; at
+boot the bot restores them from the book, or rebuilds them by replaying the
+book's trades. `POST /api/reset` clears the ledger but keeps the model.
+
 ## Controls
 
 `POST /api/close-profitable` banks every open position that is in profit.
@@ -38,10 +45,11 @@ what they skipped (a pool with no liquidity cannot be sold into).
 
 `POST /api/reset` archives the book to
 `data/archive/portfolio-before-reset-<time>.json` before clearing the portfolio
-and the learned model. An optional `{"cash": 76.16}` body starts the fresh
-book from that amount instead of the configured bankroll. It refuses while a
-position is open, and the response carries the archived path and the fresh book
-so a throwaway host can push the new book to the mirror immediately.
+(the learned model is kept and mirrored with the book). An optional
+`{"cash": 76.16}` body starts the fresh book from that amount instead of the
+configured bankroll. It refuses while a position is open, and the response
+carries the archived path and the fresh book so a throwaway host can push the
+new book to the mirror immediately.
 
 ## Exit checks
 
