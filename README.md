@@ -44,6 +44,10 @@ up a slot.
 
 ## Controls
 
+`POST /api/pause` stops new entries without touching open positions; `POST
+/api/resume` starts them again. The pause is written into the book, so a Render
+restart does not resume entries.
+
 `POST /api/close-profitable` banks every open position that is in profit.
 `POST /api/close-all` flats everything that has a buyer, profit or loss.
 Both use the pool's real depth and the normal round-trip cost, and both report
