@@ -45,6 +45,15 @@ scan-length window, not over the last poll, so checking four times as often does
 not quietly defuse it. The scan tick and the fast loop share one position-pass
 lock, so the same position can never be sold twice.
 
+## Momentum exhaustion
+
+A trade that has run and then gives back 5% of its peak price (6% on AMM pools)
+is sold, once its peak reached +6% net (+10% on AMM). This is the normal exit
+for a move that has stopped working: waiting for the 12% peak stop let winners
+that peaked at +8..+25% round-trip to breakeven or a loss. The peak stop stays
+as the backstop for a gap. Tune per venue with `*_MOMENTUM_ARM_PCT` and
+`*_MOMENTUM_GIVEBACK_PCT`; 0 turns either half off.
+
 ## Dashboard
 
 Each open position shows its mint and pool address as a chip you can tap to
