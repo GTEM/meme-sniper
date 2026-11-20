@@ -22,6 +22,6 @@ Closed trades now record `ageAtEntrySec`. The Settings card prints the what-if l
 
 ## Hold time
 
-The per-venue time stop only recycles a trade that is *below* its venue's gain floor: 12 min / +6% on the pump.fun curve, 15 min / +8% on PumpSwap, 22 min / +15% on an AMM. A winner that stalls above that floor is not touched by it, which is how two positions ran for 74 and 170 minutes (both closed by hand).
+The per-venue time stop is an idle clock, not a hold-time limit: a trade is sold when it has gone 12 minutes without a new high on the pump.fun curve, 15 on PumpSwap, or 22 on an AMM, whatever its P&L. Every new high resets the clock, so a trade that keeps running is never recycled by it; one that stalls, even in profit, gives its slot back.
 
-`MAX_HOLD_MIN` (dashboard: **Max hold**) defaults to **30** and is a hard ceiling: a trade still open after 30 minutes is sold at market whatever the P&L. Rug exits and stop losses still run first. `0` turns the cap off. A position whose pool has no tradeable depth cannot be sold, so it is not capped: it is carried until the pool prices again, or written off after 24h with no price.
+`MAX_HOLD_MIN` (dashboard: **Max hold**) defaults to **30** and is the outer bound: a trade still open after 30 minutes is sold at market whatever the P&L, even one still making new highs. Rug exits and stop losses still run first. `0` turns the cap off. A position whose pool has no tradeable depth cannot be sold, so it is not capped: it is carried until the pool prices again, or written off after 24h with no price.
