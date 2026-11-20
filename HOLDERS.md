@@ -19,3 +19,9 @@ To see which endpoint the bot is using, press Test RPC in the dashboard: it prin
 On the book at 2026-11-20 the 120s floor would have skipped 25 of 45 closed trades that netted **+$3.22**, while the 20 older trades netted **+$1.30**. It removes the DCTY rug (-$1.96) but also Rubio (+$2.52) and Cowboy Cat (+$2.16) - the early band is where both the wipeouts and the winners are, which is why this is a dashboard setting and not a hard-coded gate.
 
 Closed trades now record `ageAtEntrySec`. The Settings card prints the what-if list from the current book, so changing the floor shows its effect on past trades immediately.
+
+## Hold time
+
+The per-venue time stop only recycles a trade that is *below* its venue's gain floor: 12 min / +6% on the pump.fun curve, 15 min / +8% on PumpSwap, 22 min / +15% on an AMM. A winner that stalls above that floor is not touched by it, which is how two positions ran for 74 and 170 minutes (both closed by hand).
+
+`MAX_HOLD_MIN` (dashboard: **Max hold**) defaults to **30** and is a hard ceiling: a trade still open after 30 minutes is sold at market whatever the P&L. Rug exits and stop losses still run first. `0` turns the cap off. A position whose pool has no tradeable depth cannot be sold, so it is not capped: it is carried until the pool prices again, or written off after 24h with no price.
