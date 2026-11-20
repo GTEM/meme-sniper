@@ -58,6 +58,16 @@ DexScreener reporting `$0` liquidity on its own is still treated as a feed gap â
 some healthy PumpSwap pairs report that while trading normally. Only the pool's
 own token accounts can say the SOL leg is gone.
 
+## Corrections
+
+The book is not rewritten in place for a bad print. A fill that could not have
+happened is corrected on boot by a keyed, idempotent repair, and the old values
+are kept on the trade under `correction` plus a portfolio-level `corrections`
+log. NEX Ai is the first: it was "sold" at the time stop while its pool held 550
+tokens and 2 lamports of SOL, so $1.62 of proceeds were removed, only the real
+entry fee ($0.012525) was kept, the trade is booked at -$1.67 (-100%), and the
+model is rebuilt from the corrected book. Cash went from $67.0635 to $65.4459.
+
 ## Discovery
 
 GeckoTerminal is the firehose but rate-limits shared IPs, so discovery also reads
