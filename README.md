@@ -28,6 +28,13 @@ on every restart — the bot restores its book from the mirror at boot.
 Both use the pool's real depth and the normal round-trip cost, and both report
 what they skipped (a pool with no liquidity cannot be sold into).
 
+`POST /api/reset` archives the book to
+`data/archive/portfolio-before-reset-<time>.json` before clearing the portfolio
+and the learned model. An optional `{"cash": 76.16}` body starts the fresh
+book from that amount instead of the configured bankroll. It refuses while a
+position is open, and the response carries the archived path and the fresh book
+so a throwaway host can push the new book to the mirror immediately.
+
 ## Exit checks
 
 Open positions are re-priced every `EXIT_CHECK_MS` (6s) in a loop separate from
