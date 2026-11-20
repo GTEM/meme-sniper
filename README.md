@@ -47,6 +47,16 @@ interval. The scan tick still records equity and saves the book. The fast loop
 exists because a peak stop set at 12% used to fill 13-27% below the high (median
 ~18%): the move happened between two scans.
 
+PumpSwap positions are priced from the pool's own reserves first: one
+`getAccountInfo` per pool (cached 30 minutes) and one `getMultipleAccounts`
+for every open position's token accounts. The pool's token accounts change
+with every swap, so the exit sees the real price instead of DexScreener's
+pair quote, which was measured sitting still for 15 seconds — long enough for
+a +10% winner to print -27% on the next quote. Entries on PumpSwap fill at the
+reserve price too. If the RPC is down, the index feeds below still price the
+exit and the reserve read retries after a minute. `status.pumpswapPriced`
+counts reserve-priced samples and `status.pumpswapRpcAt` is the last one.
+
 The fast rug watch keeps its 18%/25% thresholds measured over a rolling
 scan-length window, not over the last poll, so checking four times as often does
 not quietly defuse it. The scan tick and the fast loop share one position-pass
