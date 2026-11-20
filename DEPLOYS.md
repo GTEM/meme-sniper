@@ -6,3 +6,4 @@ deploy is this log plus a push. Each entry names the bundle it shipped.
 | When (UTC)       | Bundle sha256 | Change |
 | ---------------- | ------------- | ------ |
 | 2026-11-19 00:39 | `ae6ebfbbeb5f23e967fffdf4373026f5cf6e0cefda54c1c1129796fcfbda0d29` | Every closed trade shows exact entry/exit prices plus `price move - fees = profit` on the row and in the copied record; the fees card is split into closed and open; dollars carry the sign in front (`-$0.04`). |
+| 2026-11-20 00:08 | `d7e3162baa553ca86ee2acbe05cf243eb61485c76d74812192d663cd59c1b4b0` | SOL is quoted from its own chain of keyless sources (Jupiter, DexScreener, Coinbase, Kraken, CoinGecko) and the last good quote is kept, so a single 429 at boot no longer shows a funded wallet as $0.00; if every source is down the bot re-reads the wallet 90s later. |
