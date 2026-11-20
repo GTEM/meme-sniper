@@ -36,6 +36,11 @@ the mirrored book, so a Render restart no longer resets them to the priors; at
 boot the bot restores them from the book, or rebuilds them by replaying the
 book's trades. `POST /api/reset` clears the ledger but keeps the model.
 
+The trail gap and give-back are learned the same way, as a bandit: each venue
+tries `tight`, `base` and `loose` arms, the arm is stored on the trade, and UCB1
+keeps the arm with the better average realized net PnL. The counts ride in the
+book too; `EXIT_POLICY_LEARNING=off` pins every trade to `base`.
+
 ## Controls
 
 `POST /api/close-profitable` banks every open position that is in profit.
