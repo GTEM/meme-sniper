@@ -50,6 +50,10 @@ pricing resumes; if the token moves to a new pool, the normal migration path
 follows it. A pool with no market for 24h is written off at $0 with the reason
 kept in the book.
 
+PumpSwap creates pools in both mint orders: token/WSOL and WSOL/token. Both are
+read now. Rejecting the inverted ones is what left NEX Ai priced only by the
+index while its own pool held 2 lamports of SOL and 550 tokens.
+
 DexScreener reporting `$0` liquidity on its own is still treated as a feed gap —
 some healthy PumpSwap pairs report that while trading normally. Only the pool's
 own token accounts can say the SOL leg is gone.
