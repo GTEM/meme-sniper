@@ -38,9 +38,9 @@ A symbol is pinned for 24h after **every** close, win or loss; the mint is
 pinned after any loss or rug. Pins are rebuilt from the mirrored book at boot,
 so a Render restart no longer forgets them. A second mint with a name already
 held is vetoed. A pool whose SOL leg is confirmed drained is written off at $0
-after 2 minutes instead of being carried at entry for a day; a missing feed or
-migration gets 10 minutes. Holding a dead pool at entry was fake equity and tied
-up a slot.
+on the first check; a missing feed or migration is treated the same way. There
+is no grace period and no held state: a position with no priced exit is closed
+immediately. Holding a dead pool at entry was fake equity and tied up a slot.
 
 ## Controls
 
