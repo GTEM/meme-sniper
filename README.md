@@ -28,6 +28,19 @@ on every restart — the bot restores its book from the mirror at boot.
 Both use the pool's real depth and the normal round-trip cost, and both report
 what they skipped (a pool with no liquidity cannot be sold into).
 
+## Exit checks
+
+Open positions are re-priced every `EXIT_CHECK_MS` (6s) in a loop separate from
+the 25s scan. A flat book makes no requests; with positions it is one batched
+price call per chain, and it backs off if the feed stops pricing them. The scan
+tick still records equity and saves the book. The fast loop exists because a
+peak stop set at 12% used to fill 13-27% below the high (median ~18%): the move
+happened between two scans.
+
+The fast rug watch keeps its 18%/25% thresholds measured over a rolling
+scan-length window, not over the last poll, so checking four times as often does
+not quietly defuse it.
+
 ## Dashboard
 
 Each open position shows its mint and pool address as a chip you can tap to
