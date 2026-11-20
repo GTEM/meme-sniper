@@ -21,6 +21,15 @@ which resets Render's 15-minute idle timer. Free tier limits: 750 instance hours
 a month (a 31-day month is 744), 0.1 CPU, 512 MB, and a filesystem that is wiped
 on every restart — the bot restores its book from the mirror at boot.
 
+## Entry gate (2026-11-20)
+
+Churn is refused at any depth now. 5m volume above the pool's own liquidity
+means the exit is being sold into you, and a deep pool does not change that. In
+the 157-trade book the 32 buys the deep-pool override waved through — every one
+of them a churn veto — netted **-$8.50**, while the other 125 made **+$13.12**.
+`DEEP_LIQ_OVERRIDE_USD` defaults to `0`; a non-zero value can only clear a
+safety or accumulated-risk veto, never churn.
+
 ## Controls
 
 `POST /api/close-profitable` banks every open position that is in profit.
