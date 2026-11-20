@@ -32,6 +32,16 @@ curve. The AMM profile is **1% round trip** (0.5% a side), capped at 1%: the old
 at the 1% rate, with the old values kept on each trade under `feeCorrection`;
 urgent exits keep their 150 bps premium.
 
+## Copycats and dead pools
+
+A symbol is pinned for 24h after **every** close, win or loss; the mint is
+pinned after any loss or rug. Pins are rebuilt from the mirrored book at boot,
+so a Render restart no longer forgets them. A second mint with a name already
+held is vetoed. A pool whose SOL leg is confirmed drained is written off at $0
+after 2 minutes instead of being carried at entry for a day; a missing feed or
+migration gets 10 minutes. Holding a dead pool at entry was fake equity and tied
+up a slot.
+
 ## Controls
 
 `POST /api/close-profitable` banks every open position that is in profit.
