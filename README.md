@@ -39,6 +39,21 @@ veto; 0 is the default. The freshness feature stays on a 20-minute scale either
 way, so turning the cap off does not change what the model learned about young
 launches.
 
+## Drained quote leg
+
+A PumpSwap pool can lose its SOL side while the token side stays put. That is not
+a feed gap, and it is not a price the bot can sell into. An on-chain reserve read
+showing tokens and no SOL now marks the position held within one 6s tick: zero
+depth, carried at entry, dashboard reason "pool SOL reserve drained", and no
+time-stop sale at a stale quote. If the SOL leg comes back on the same pool,
+pricing resumes; if the token moves to a new pool, the normal migration path
+follows it. A pool with no market for 24h is written off at $0 with the reason
+kept in the book.
+
+DexScreener reporting `$0` liquidity on its own is still treated as a feed gap —
+some healthy PumpSwap pairs report that while trading normally. Only the pool's
+own token accounts can say the SOL leg is gone.
+
 ## Discovery
 
 GeckoTerminal is the firehose but rate-limits shared IPs, so discovery also reads
