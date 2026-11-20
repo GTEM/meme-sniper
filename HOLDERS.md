@@ -12,6 +12,10 @@ A mint younger than about ninety seconds may have no holder block yet. A pool re
 
 To see which endpoint the bot is using, press Test RPC in the dashboard: it prints the host and whether getTokenLargestAccounts answers.
 
+## Deep-pool veto override
+
+`DEEP_LIQ_OVERRIDE_USD` (dashboard: **Deep-pool veto override**) defaults to **20000**. When a pool is at least this deep, a soft entry veto - churn, the safety composite, accumulated rug risk - no longer blocks the buy: the candidate is scored and, if it clears the model, entered with the original veto recorded on the trade and in the scan card. Hard safety signals still veto at any depth: honeypot, unrevoked mint/freeze authority, the rug blacklist, top-10 concentration above 70%, a bundle cluster, liquidity already draining, a single-minute 60% dump, missing holder data, and the age/liquidity bands. `0` turns the override off.
+
 ## Minimum pool age
 
 `MIN_AGE_SEC` (dashboard: **Minimum pool age**) defaults to **120 seconds**. Pools younger than the floor are skipped at discovery before scoring: a pool with one tick of history has no exit to read, and a dev can drain it between two 25-second scans. `0` turns the floor off; the old behaviour was 15.
