@@ -23,12 +23,11 @@ on every restart — the bot restores its book from the mirror at boot.
 
 ## Entry gate (2026-11-20)
 
-Churn is refused at any depth now. 5m volume above the pool's own liquidity
-means the exit is being sold into you, and a deep pool does not change that. In
-the 157-trade book the 32 buys the deep-pool override waved through — every one
-of them a churn veto — netted **-$8.50**, while the other 125 made **+$13.12**.
-`DEEP_LIQ_OVERRIDE_USD` defaults to `0`; a non-zero value can only clear a
-safety or accumulated-risk veto, never churn.
+A launch is refused when 5m volume exceeds **150% of the pool's own liquidity**.
+The 157-trade book puts the break there: the 100–150% band made +$0.16 a trade,
+while 150–200% lost $1.00 a trade and held three total-loss rugs. The deep-pool
+override is off by default (`DEEP_LIQ_OVERRIDE_USD=0`) and can never clear churn;
+a non-zero value only clears a safety or accumulated-risk veto.
 
 ## Controls
 
