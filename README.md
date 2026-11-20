@@ -73,6 +73,10 @@ that peaked at +8..+25% round-trip to breakeven or a loss. The peak stop stays
 as the backstop for a gap. Tune per venue with `*_MOMENTUM_ARM_PCT` and
 `*_MOMENTUM_GIVEBACK_PCT`; 0 turns either half off.
 
+A separate loss cut, **momentum death**, exits after three lower readings while
+more than 8% underwater; its reason carries the net and peak so it is not
+confused with the winner give-back above.
+
 ## Dashboard
 
 Each open position shows its mint and pool address as a chip you can tap to
