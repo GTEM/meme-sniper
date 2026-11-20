@@ -29,6 +29,16 @@ while 150–200% lost $1.00 a trade and held three total-loss rugs. The deep-poo
 override is off by default (`DEEP_LIQ_OVERRIDE_USD=0`) and can never clear churn;
 a non-zero value only clears a safety or accumulated-risk veto.
 
+## Age
+
+There is no upper age limit. `MIN_AGE_SEC` (2 minutes) keeps launches too young
+to have a pool out, but an old coin that starts moving is eligible on the same
+signals as a new one: turnover, buy pressure, momentum, holder concentration and
+liquidity. Set `MAX_AGE_SEC` to a positive value to restore a hard "too old"
+veto; 0 is the default. The freshness feature stays on a 20-minute scale either
+way, so turning the cap off does not change what the model learned about young
+launches.
+
 ## Discovery
 
 GeckoTerminal is the firehose but rate-limits shared IPs, so discovery also reads
@@ -36,7 +46,8 @@ DexScreener token profiles and Jupiter's recent launches. Jupiter's buffer holds
 half an hour of mints; each scan now prices 30 spread across that age range
 instead of only the newest and oldest fifteen. The ends were the two useless
 bands — pools seconds old have no indexed liquidity, and the oldest are about to
-age out — while the 2–20 minute window the gate trades was never sampled.
+age out — while the middle of the window is where a launch actually becomes
+tradeable.
 
 ## Learning
 
